@@ -1,0 +1,27 @@
+﻿[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autonomous-content-auditor-engine"
+version = "1.0.0"
+authors = [
+  { name="Principal AI Architecture Team" }
+]
+description = "Enterprise Autonomous Content Auditor & Fact-Checking Engine with Google ADK, Gemini 3.5 Flash, and Google Search Grounding"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "google-adk>=0.1.0",
+    "google-genai>=1.2.0",
+    "google-cloud-aiplatform>=1.75.0",
+    "pydantic>=2.10.0",
+    "python-dotenv>=1.0.1",
+    "rich>=13.9.0",
+]
