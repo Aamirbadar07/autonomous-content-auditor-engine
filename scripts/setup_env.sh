@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 # ==============================================================================
 # Google Cloud Shell Automated Setup Script
 # Zero Hardcoded Credentials: Sets up ADK environment with Application Default Credentials
@@ -21,7 +21,6 @@ fi
 echo "[1/4] Enabling required Google Cloud APIs..."
 gcloud services enable \
     aiplatform.googleapis.com \
-    run.googleapis.com \
     --project="${PROJECT_ID}"
 
 echo "[2/4] Initializing Python 3.11 virtual environment..."

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Specialist Synthesis Reviser Agent.
 Ingests the original copy along with the Critic's factual audit report,
 rewriting the content into engaging, 100% compliant, publication-ready copy.
@@ -18,6 +18,10 @@ agent = Agent(
         "You receive the original draft alongside the Critic's itemized factual audit report. "
         "Your mission is to rewrite the text to achieve 100% factual accuracy while maintaining "
         "an engaging, persuasive, and professional tone suitable for publication. "
+        "\n\nThe Critic's audit report follows.\n"
+        "-----------------------------------\n"
+        "{criticism}\n"
+        "-----------------------------------\n\n"
         "Strict Editorial Guidelines: "
         "1. Faithfully incorporate every correction and verified fact highlighted by the Critic. "
         "2. Remove or replace all debunked assertions and misleading superlatives. "
@@ -27,3 +31,4 @@ agent = Agent(
 )
 
 reviser_agent = agent
+root_agent = agent

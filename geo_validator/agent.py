@@ -1,7 +1,7 @@
-﻿"""
+"""
 Destination Verifier Agent.
 Enforces strict Pydantic v2 JSON contracts (CountryCapital model) using
-output_schema and restricted delegation (disallow_transfer=True).
+output_schema and restricted delegation.
 """
 from __future__ import annotations
 
@@ -37,5 +37,11 @@ agent = Agent(
         "Do not engage in conversational filler and do not transfer control to any other agent."
     ),
     output_schema=CountryCapital,
-    disallow_transfer=True,
+    # ADK does not restrict delegation on its own when output_schema is set,
+    # so both directions are disallowed explicitly to keep the agent isolated.
+    disallow_transfer_to_parent=True,
+    disallow_transfer_to_peers=True,
 )
+
+# ADK's loader resolves agents by the name `root_agent`.
+root_agent = agent

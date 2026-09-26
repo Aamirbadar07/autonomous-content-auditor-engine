@@ -1,4 +1,4 @@
-﻿# Autonomous Content Auditor & Fact-Checking Engine
+# Autonomous Content Auditor & Fact-Checking Engine
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Vertex AI Gemini 3.5 Flash](https://img.shields.io/badge/Vertex%20AI-Gemini%203.5%20Flash-4285F4.svg?logo=google-cloud&logoColor=white)](https://cloud.google.com/vertex-ai)
@@ -80,7 +80,7 @@ sequenceDiagram
 - **Path**: `geo_validator/agent.py`
 - **Model**: `gemini-3.5-flash`
 - **Contract**: Strictly enforces the Pydantic v2 `CountryCapital` model via `output_schema`.
-- **Security & Flow Control**: Enforces `disallow_transfer=True` to guarantee deterministic isolation, preventing the agent from delegating to other agents in the environment.
+- **Security & Flow Control**: Sets `disallow_transfer_to_parent=True` and `disallow_transfer_to_peers=True` for deterministic isolation, preventing the agent from delegating to other agents in the environment. ADK does not infer these from `output_schema`, so both are declared explicitly.
 
 ### 3. `llm_auditor` (Multi-Agent Editorial Pipeline)
 - **Path**: `llm_auditor/agent.py`
@@ -117,6 +117,8 @@ autonomous-content-auditor-engine/
 │       └── agent.py               # Editorial synthesis reviser agent
 ├── samples/
 │   └── brochure_sample.txt        # Unverified marketing copy for testing
+├── tests/
+│   └── test_agents.py             # Structural tests for agent loading and wiring
 └── scripts/
     └── setup_env.sh               # Google Cloud Shell environment bootstrapping
 ```
@@ -140,6 +142,10 @@ cp .env.example .env
 | `GOOGLE_CLOUD_LOCATION` | Region for Vertex AI Gemini API endpoint | `us-central1` |
 | `MODEL_NAME` | Primary foundation model identifier | `gemini-3.5-flash` |
 | `LOG_LEVEL` | Python application logging verbosity | `INFO` |
+
+**Without a Google Cloud project**, the agents also run against the Gemini Developer API.
+Set `GOOGLE_GENAI_USE_VERTEXAI=False` and `GOOGLE_API_KEY=<your key>` in `.env` instead of the
+project variables; ADK loads `.env` automatically from the agent directory.
 
 ---
 
@@ -168,6 +174,16 @@ pip install -r requirements.txt
 gcloud auth application-default login
 ```
 
+### 3. Running the Tests
+
+The suite is structural — it asserts the contracts ADK relies on to load and wire the
+agents, so it needs no credentials and makes no model calls:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
 ---
 
 ## 🖥️ Execution Workflows (CLI & Web UI)
@@ -180,7 +196,7 @@ Launch the ADK visual dashboard to inspect agent state transitions, tool call ar
 ```bash
 adk web
 ```
-*Open your browser at `http://localhost:8080` (or the URL displayed in the terminal).*
+*Open your browser at `http://localhost:8000` (or the URL displayed in the terminal).*
 
 ### Option B: Command-Line Interface (CLI)
 
@@ -210,16 +226,24 @@ adk run llm_auditor < samples/brochure_sample.txt
 
 ## 🧪 Sample Audit Transformation
 
+> [!NOTE]
+> The exchange below illustrates the **expected shape** of each stage's output. It is
+> not a recorded transcript, and live model output will differ in wording and ordering.
+> Run `adk run llm_auditor < samples/brochure_sample.txt` to produce a real one.
+
 ### Input (Unverified Travel Copy)
-> *"Join Cymbal Travel for an unforgettable 4-day excursion to Paris! Experience the Eiffel Tower, constructed in 1912 by Gustave Eiffel. Tour the Louvre, which has been the official residence of the French President since 1875. On Day 3, we take a luxury coach to Versailles, just 5 km northeast of Paris, and finish with an evening cruise on the Thames River as the sun sets over Notre-Dame Cathedral."*
+The full draft lives in [`samples/brochure_sample.txt`](samples/brochure_sample.txt) and plants six
+verifiable errors across history, geography, pricing and logistics.
 
 ### Stage 1 Output (`auditor_critic`)
 ```markdown
 ### Fact-Checking Audit Report
 - [FACTUAL ERROR]: Eiffel Tower construction date is incorrect. Grounding indicates it was completed in 1889 for the Exposition Universelle, not 1912.
 - [FACTUAL ERROR]: The Louvre is a national museum; the official residence of the French President is the Élysée Palace (Palais de l'Élysée).
+- [FACTUAL ERROR]: The Hall of Mirrors was built between 1678 and 1684, not completed in 1640 (Louis XIV was born in 1638).
 - [GEOGRAPHIC ERROR]: The Palace of Versailles is located approximately 20 km southwest of Paris, not 5 km northeast.
 - [GEOGRAPHIC ERROR]: The Thames River is in London, UK. The river flowing past Notre-Dame Cathedral in Paris is the Seine.
+- [MISLEADING / AMBIGUOUS]: "Round-trip bullet train transfers from Rome" for a Paris tour at 450 EUR is unsupported; no high-speed rail service links Rome and Paris at that fare.
 ```
 
 ### Stage 2 Output (`auditor_reviser`)

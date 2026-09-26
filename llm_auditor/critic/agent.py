@@ -1,4 +1,4 @@
-﻿"""
+"""
 Specialist Fact-Checking Critic Agent.
 Audits assertions in marketing copy, brochures, and travel literature against live web sources.
 Equipped with Google Search grounding and powered by Gemini 3.5 Flash.
@@ -27,6 +27,10 @@ agent = Agent(
         "4. Conclude with explicit, actionable directives for the reviser to correct the copy."
     ),
     tools=[google_search],
+    # Published to session state so the reviser binds to this report by name
+    # rather than relying on it happening to be the previous turn.
+    output_key="criticism",
 )
 
 critic_agent = agent
+root_agent = agent
