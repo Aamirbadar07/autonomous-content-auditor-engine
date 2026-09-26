@@ -22,6 +22,11 @@ dependencies = [
     "pydantic>=2.10.0",
 ]
 
+[tool.setuptools.packages.find]
+# Without this, flat-layout auto-discovery fails on the samples/ and tests/
+# directories and `pip install -e .` errors out.
+include = ["geo_validator*", "llm_auditor*", "my_google_search_agent*"]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
