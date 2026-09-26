@@ -1,4 +1,4 @@
-﻿"""
+"""
 Root SequentialAgent orchestrating the Critic-to-Reviser audit pipeline.
 Executes an end-to-end multi-agent verification flow:
   Phase 1: auditor_critic (Identifies claims and cross-examines via Google Search)
@@ -19,3 +19,6 @@ agent = SequentialAgent(
         "marketing brochures and technical claims meet strict factual standards."
     ),
 )
+
+# ADK's loader resolves agents by the name `root_agent`.
+root_agent = agent

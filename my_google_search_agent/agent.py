@@ -1,4 +1,4 @@
-﻿"""
+"""
 Travel Scout Agent equipped with the native Google Search tool for real-time grounding.
 Leverages Gemini 3.5 Flash for high-speed, fact-checked destination scouting.
 """
@@ -22,3 +22,6 @@ agent = Agent(
     ),
     tools=[google_search],
 )
+
+# ADK's loader resolves agents by the name `root_agent`.
+root_agent = agent
